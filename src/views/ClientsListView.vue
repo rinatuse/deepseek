@@ -1,29 +1,18 @@
 <script setup>
-import {onMounted, ref} from 'vue'
-import {getClients} from '../api/clients.js'
+import { onMounted } from 'vue'
+import { useClientsStore } from '../stores/clients.js'
 
-const clients = ref([])
-const isLoading = ref(true)
-const error = ref(null)
+const store = useClientsStore()
 
-onMounted(
-  async () => {
-    try {
-      clients.value = await getClients()
-    } catch (err) {
-      error.value = err.message
-    } finally {
-      isLoading.value = false
-    }
-  }
-)
+onMounted(() => store.fetchClients())
+
 </script>
 
 <template>
   <h1>Клиенты</h1>
 
-  <p v-if="isLoading">Загрузка...</p>
-  <p v-else-if="error">Ошибка: {{ error }}</p>
+  <p v-if="store.isLoading">Загрузка...</p>
+  <p v-else-if="store.error">Ошибка: {{ store.error }}</p>
 
   <table v-else>
     <thead>
@@ -36,7 +25,7 @@ onMounted(
       </tr>
     </thead>
     <tbody>
-      <tr v-for="client in clients" :key="client.id">
+      <tr v-for="client in store.clients" :key="client.id">
         <td>{{ client.name }}</td>
         <td>{{ client.email  }}</td>
         <td>{{ client.phone  }}</td>
