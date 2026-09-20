@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useClientsStore } from '../stores/clients.js'
+import ClientsFilters from '../components/ClientsFilters.vue'
 
 const store = useClientsStore()
 
@@ -10,6 +11,8 @@ onMounted(() => store.fetchClients())
 
 <template>
   <h1>Клиенты</h1>
+
+  <ClientsFilters />
 
   <p v-if="store.isLoading">Загрузка...</p>
   <p v-else-if="store.error">Ошибка: {{ store.error }}</p>

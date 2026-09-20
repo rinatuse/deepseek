@@ -6,8 +6,21 @@ const headers = {
   Authorization: `Bearer ${API_KEY}`,
 }
 
-export async function getClients() {
-  const response = await fetch(`${BASE_URL}/rest/v1/clients?select=*`, {
+export async function getClients(filters = {}) {
+  const params = new URLSearchParams()
+  params.set('select', '*')
+  params.set('order', 'created_at.desc')
+
+  if (filters.status) {
+    params.set('status', `eq.${filters.status}`)
+  }
+
+  if (filters.search && filters.search.trim()) {
+    const term = filters.search.trim()
+    params.set('or', `(name.ilike.*${term}*,email.ilike.*${term}*)`)
+  }
+
+  const response = await fetch(`${BASE_URL}/rest/v1/clients?${params.toString()}`, {
     headers,
   })
 

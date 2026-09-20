@@ -6,12 +6,13 @@ export const useClientsStore = defineStore('clients', () => {
   const clients = ref([])
   const isLoading = ref(false)
   const error = ref(null)
+  const filters = ref({ status: '', search: '' })
 
   async function fetchClients() {
     isLoading.value = true
     error.value = null
     try {
-      const data = await getClients()
+      const data = await getClients(filters.value)
       clients.value = data
     } catch (err) {
       error.value = err.message
@@ -20,5 +21,10 @@ export const useClientsStore = defineStore('clients', () => {
     }
   }
 
-  return { clients, isLoading, error, fetchClients }
+  function setFilters(newFilters) {
+    filters.value = { ...filters.value, ...newFilters }
+    fetchClients()
+  }
+
+  return { clients, isLoading, error, fetchClients, setFilters }
 })
