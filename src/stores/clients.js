@@ -6,7 +6,7 @@ export const useClientsStore = defineStore('clients', () => {
   const clients = ref([])
   const isLoading = ref(false)
   const error = ref(null)
-  const filters = ref({ status: '', search: '' })
+  const filters = ref({ status: '', search: '', budget: { min: 0, max: 1000000 } })
 
   async function fetchClients() {
     isLoading.value = true

@@ -9,7 +9,7 @@ const headers = {
 const filterConfig = [
   { type: 'eq', key: 'status', column: 'status' },
   { type: 'search', key: 'search', columns: ['name', 'email'] },
-  { type: 'range', key: 'budget', column: 'budget' },
+  { type: 'range', key: 'budget', column: 'budget', min: 0, max: 1000000 },
 ]
 
 function buildClientsParams(filters) {
@@ -31,10 +31,10 @@ function buildClientsParams(filters) {
     }
 
     if (def.type === 'range' && value) {
-      if (value.min != null) {
+      if (value.min != null && value.min > def.min) {
         params.append(def.column, `gte.${value.min}`)
       }
-      if (value.max != null) {
+      if (value.max != null && value.max < def.max) {
         params.append(def.column, `lte.${value.max}`)
       }
     }
@@ -44,18 +44,8 @@ function buildClientsParams(filters) {
 }
 
 export async function getClients(filters = {}) {
-  const params = new URLSearchParams()
-  params.set('select', '*')
-  params.set('order', 'created_at.desc')
 
-  if (filters.status) {
-    params.set('status', `eq.${filters.status}`)
-  }
-
-  if (filters.search && filters.search.trim()) {
-    const term = filters.search.trim()
-    params.set('or', `(name.ilike.*${term}*,email.ilike.*${term}*)`)
-  }
+  const params = buildClientsParams(filters)
 
   const response = await fetch(`${BASE_URL}/rest/v1/clients?${params.toString()}`, {
     headers,
